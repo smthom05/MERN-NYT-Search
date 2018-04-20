@@ -1,43 +1,22 @@
-var express = require("express");
-var bodyParser = require("body-parser");
-var logger = require("morgan");
-var mongoose = require("mongoose");
-
-// Our scraping tools
-// Axios is a promised-based http library, similar to jQuery's Ajax method
-// It works on the client and on the server
-var axios = require("axios");
-var cheerio = require("cheerio");
-
-// Require all models
-var db = require("./models");
-
+const express = require("express");
+const bodyParser = require("body-parser");
+const mongoose = require("mongoose");
+const routes = require("./routes");
+const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Initialize Express
-var app = express();
+// Configure body parser for AJAX requests
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+// Serve up static assets
+app.use(express.static("client/build"));
+// Add routes, both API and view
+app.use(routes);
 
-// Configure middleware
-
-// Use morgan logger for logging requests
-app.use(logger("dev"));
-// Use body-parser for handling form submissions
-app.use(bodyParser.urlencoded({ extended: false }));
-// Use express.static to serve the public folder as a static directory
-app.use(express.static("public"));
-
-// Set mongoose to leverage built in JavaScript ES6 Promises
 // Connect to the Mongo DB
-mongoose.Promise = Promise;
-mongoose.connect("mongodb://localhost/nytreact", {
-  useMongoClient: true
-});
+mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/reactreadinglist");
 
-// Routes
-
-
-
-// Start the server
+// Start the API server
 app.listen(PORT, function() {
-  console.log("App running on port " + PORT + "!");
+  console.log(`🌎  ==> API Server now listening on PORT ${PORT}!`);
 });
